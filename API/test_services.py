@@ -1,10 +1,5 @@
 """
 Tests for services.py — uses mongomock (no real Atlas connection needed).
-
-Run:
-    source venv/bin/activate
-    pip install pytest mongomock
-    pytest test_services.py -v
 """
 
 import mongomock
