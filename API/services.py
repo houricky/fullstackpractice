@@ -1,5 +1,5 @@
 import database
-from models import Account, Customer, CustomerCreate
+from models import Account, Customer, CustomerCreate, CustomerUpdate
 
 
 def _doc_to_account(doc: dict) -> Account:
@@ -45,6 +45,26 @@ def create_customer(customer_data: CustomerCreate) -> Customer:
     }
     database.customers_collection.insert_one(doc)
     return Customer(id=new_id, name=customer_data.name, email=customer_data.email)
+
+
+def update_customer(customer_id: int, customer_data: CustomerUpdate) -> Customer | None:
+    result = database.customers_collection.update_one(
+        {"id": customer_id},
+        {"$set": {"name": customer_data.name, "email": customer_data.email}},
+    )
+    if result.matched_count == 0:
+        return None
+    return get_customer_by_id(customer_id)
+
+
+def delete_customer(customer_id: int) -> bool:
+    customer = database.customers_collection.find_one({"id": customer_id})
+    if customer is None:
+        return False
+
+    database.accounts_collection.delete_many({"customer_id": customer_id})
+    database.customers_collection.delete_one({"id": customer_id})
+    return True
 
 
 def get_next_customer_id() -> int:

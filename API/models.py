@@ -22,6 +22,12 @@ class CustomerCreate(BaseModel):
     email: str
 
 
+class CustomerUpdate(BaseModel):
+    """Body for PUT — client sends the full updated customer fields."""
+    name: str
+    email: str
+
+
 class AccountCreate(BaseModel):
     customer_id: int
     account_number: str

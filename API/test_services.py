@@ -6,12 +6,15 @@ import mongomock
 import pytest
 
 import database
-from models import CustomerCreate
+from models import CustomerCreate, CustomerUpdate
 from services import (
     create_customer,
+    delete_customer,
     get_all_customers,
+    get_customer_by_id,
     get_next_account_id,
     get_next_customer_id,
+    update_customer,
 )
 
 
@@ -114,3 +117,31 @@ def test_create_customer_inserts_into_collection():
     stored = database.customers_collection.find_one({"id": 4})
     assert stored is not None
     assert stored["name"] == "Diana"
+
+
+def test_update_customer_success_changes_fields():
+    _seed_test_data()
+    updated = update_customer(
+        1, CustomerUpdate(name="Alice Updated", email="alice.new@email.com")
+    )
+
+    assert updated is not None
+    assert updated.name == "Alice Updated"
+    assert updated.email == "alice.new@email.com"
+
+
+def test_update_customer_failure_returns_none_when_missing():
+    _seed_test_data()
+    assert update_customer(999, CustomerUpdate(name="X", email="x@x.com")) is None
+
+
+def test_delete_customer_success_removes_customer_and_accounts():
+    _seed_test_data()
+    assert delete_customer(1) is True
+    assert get_customer_by_id(1) is None
+    assert database.accounts_collection.count_documents({"customer_id": 1}) == 0
+
+
+def test_delete_customer_failure_returns_false_when_missing():
+    _seed_test_data()
+    assert delete_customer(999) is False

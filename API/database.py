@@ -10,4 +10,3 @@ db = client["bank_api"]
 
 customers_collection = db["customers"]
 accounts_collection = db["accounts"]
-
