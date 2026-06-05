@@ -95,3 +95,11 @@ td.actions button {
   padding: 4px 8px;
   font-size: 13px;
 }
+
+.error {
+  color: #b00020;
+  background: #fde8e8;
+  border: 1px solid #f5c2c2;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}

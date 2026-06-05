@@ -1,41 +1,35 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import * as customerApi from './api/customers'
 import CustomerList from './components/CustomerList'
 import CustomerForm from './components/CustomerForm'
 import CustomerDetail from './components/CustomerDetail'
 import './App.css'
 
-// placeholder data — replace with API calls later
-const MOCK_CUSTOMERS = [
-  {
-    id: 1,
-    name: 'Alice Smith',
-    email: 'alice@email.com',
-    accounts: [
-      { id: 1, account_number: 'A100', account_type: 'Checking', balance: 5000 },
-      { id: 2, account_number: 'A101', account_type: 'Savings', balance: 8000 },
-    ],
-  },
-  {
-    id: 2,
-    name: 'Bob Jones',
-    email: 'bob@email.com',
-    accounts: [
-      { id: 3, account_number: 'A102', account_type: 'Checking', balance: 2000 },
-    ],
-  },
-  {
-    id: 3,
-    name: 'Charlie Brown',
-    email: 'charlie@email.com',
-    accounts: [],
-  },
-]
-
 function App() {
   const [view, setView] = useState('list')
   const [selectedId, setSelectedId] = useState(null)
+  const [customers, setCustomers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const selectedCustomer = MOCK_CUSTOMERS.find((c) => c.id === selectedId)
+  const selectedCustomer = customers.find((c) => c.id === selectedId)
+
+  async function loadCustomers() {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await customerApi.getCustomers()
+      setCustomers(data)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadCustomers()
+  }, [])
 
   function goToList() {
     setView('list')
@@ -57,20 +51,35 @@ function App() {
     setView('edit')
   }
 
-  function handleDelete(id) {
-    // TODO: call DELETE /api/customers/{id}
-    console.log('delete customer', id)
+  async function handleDelete(id) {
+    setError(null)
+    try {
+      await customerApi.deleteCustomer(id)
+      await loadCustomers()
+    } catch (err) {
+      setError(err.message)
+    }
   }
 
-  function handleSave(customer) {
-    if (view === 'create') {
-      // TODO: call POST /api/customers
-      console.log('create customer', customer)
-    } else {
-      // TODO: call PUT /api/customers/{id}
-      console.log('update customer', customer)
+  async function handleSave(customer) {
+    setError(null)
+    try {
+      if (view === 'create') {
+        await customerApi.createCustomer({
+          name: customer.name,
+          email: customer.email,
+        })
+      } else {
+        await customerApi.updateCustomer(customer.id, {
+          name: customer.name,
+          email: customer.email,
+        })
+      }
+      await loadCustomers()
+      goToList()
+    } catch (err) {
+      setError(err.message)
     }
-    goToList()
   }
 
   return (
@@ -87,10 +96,14 @@ function App() {
         </nav>
       </header>
 
+      {error && <p className="error">{error}</p>}
+
       <main>
-        {view === 'list' && (
+        {loading && view === 'list' && <p>Loading...</p>}
+
+        {!loading && view === 'list' && (
           <CustomerList
-            customers={MOCK_CUSTOMERS}
+            customers={customers}
             onView={handleView}
             onEdit={handleEdit}
             onDelete={handleDelete}
