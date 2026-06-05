@@ -7,7 +7,9 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "fullstackpractice-8h8hqjbha-hourickys-projects.vercel.app"],
+    allow_origins=[
+    "http://localhost:5173",
+    "https://fullstackpractice-8h8hqjbha-hourickys-projects.vercel.app",],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
