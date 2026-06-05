@@ -9,8 +9,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
     "http://localhost:5173",
-    "https://fullstackpractice-8h8hqjbha-hourickys-projects.vercel.app", 
-    "https://fullstackpractice-iota.vercel.app/",],
+    "https://fullstackpractice-lx6h57jds-hourickys-projects.vercel.app", 
+    "https://fullstackpractice-iota.vercel.app",],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
