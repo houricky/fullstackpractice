@@ -1,121 +1,128 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import CustomerList from './components/CustomerList'
+import CustomerForm from './components/CustomerForm'
+import CustomerDetail from './components/CustomerDetail'
 import './App.css'
 
+// placeholder data — replace with API calls later
+const MOCK_CUSTOMERS = [
+  {
+    id: 1,
+    name: 'Alice Smith',
+    email: 'alice@email.com',
+    accounts: [
+      { id: 1, account_number: 'A100', account_type: 'Checking', balance: 5000 },
+      { id: 2, account_number: 'A101', account_type: 'Savings', balance: 8000 },
+    ],
+  },
+  {
+    id: 2,
+    name: 'Bob Jones',
+    email: 'bob@email.com',
+    accounts: [
+      { id: 3, account_number: 'A102', account_type: 'Checking', balance: 2000 },
+    ],
+  },
+  {
+    id: 3,
+    name: 'Charlie Brown',
+    email: 'charlie@email.com',
+    accounts: [],
+  },
+]
+
 function App() {
-  const [count, setCount] = useState(0)
+  const [view, setView] = useState('list')
+  const [selectedId, setSelectedId] = useState(null)
+
+  const selectedCustomer = MOCK_CUSTOMERS.find((c) => c.id === selectedId)
+
+  function goToList() {
+    setView('list')
+    setSelectedId(null)
+  }
+
+  function handleView(id) {
+    setSelectedId(id)
+    setView('detail')
+  }
+
+  function handleCreate() {
+    setSelectedId(null)
+    setView('create')
+  }
+
+  function handleEdit(id) {
+    setSelectedId(id)
+    setView('edit')
+  }
+
+  function handleDelete(id) {
+    // TODO: call DELETE /api/customers/{id}
+    console.log('delete customer', id)
+  }
+
+  function handleSave(customer) {
+    if (view === 'create') {
+      // TODO: call POST /api/customers
+      console.log('create customer', customer)
+    } else {
+      // TODO: call PUT /api/customers/{id}
+      console.log('update customer', customer)
+    }
+    goToList()
+  }
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app">
+      <header>
+        <h1>Bank App</h1>
+        <nav>
+          <button type="button" onClick={goToList}>
+            Customers
+          </button>
+          <button type="button" onClick={handleCreate}>
+            New Customer
+          </button>
+        </nav>
+      </header>
 
-      <div className="ticks"></div>
+      <main>
+        {view === 'list' && (
+          <CustomerList
+            customers={MOCK_CUSTOMERS}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        )}
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {view === 'detail' && selectedCustomer && (
+          <CustomerDetail
+            customer={selectedCustomer}
+            onBack={goToList}
+            onEdit={() => handleEdit(selectedCustomer.id)}
+          />
+        )}
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+        {view === 'create' && (
+          <CustomerForm
+            title="New Customer"
+            onSave={handleSave}
+            onCancel={goToList}
+          />
+        )}
+
+        {view === 'edit' && selectedCustomer && (
+          <CustomerForm
+            title="Edit Customer"
+            customer={selectedCustomer}
+            onSave={handleSave}
+            onCancel={goToList}
+          />
+        )}
+      </main>
+    </div>
   )
 }
 
