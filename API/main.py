@@ -7,7 +7,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://bank-console-app.vercel.app"],
+    allow_origins=["http://localhost:5173", "https://fullstackpractice-api.onrender.com"],
     
     allow_methods=["*"],
     allow_headers=["*"],
