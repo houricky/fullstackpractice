@@ -16,6 +16,12 @@ header h1 {
   font-size: 24px;
 }
 
+.user-info {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #555;
+}
+
 nav button {
   margin-right: 8px;
 }

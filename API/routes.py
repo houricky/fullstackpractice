@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
+from dependencies import get_current_user
 
 from models import CustomerCreate, CustomerUpdate
 from services import (
@@ -39,7 +40,10 @@ def replace_customer(customer_id: int, customer_data: CustomerUpdate):
 
 
 @router.delete("/api/customers/{customer_id}", status_code=status.HTTP_204_NO_CONTENT)
-def remove_customer(customer_id: int):
+def remove_customer(
+    customer_id: int,
+    _user: str = Depends(get_current_user),
+):
     deleted = delete_customer(customer_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Customer not found")

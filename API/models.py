@@ -33,3 +33,11 @@ class AccountCreate(BaseModel):
     account_number: str
     account_type: str
     balance: float
+
+class User(BaseModel):
+    id: int
+    username: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str = "bearer"

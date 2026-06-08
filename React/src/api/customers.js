@@ -1,3 +1,5 @@
+import { authHeaders } from './auth'
+
 const API_BASE = `${import.meta.env.VITE_API_URL}/api/customers`
 
 async function handleResponse(res) {
@@ -36,5 +38,8 @@ export function updateCustomer(id, data) {
 }
 
 export function deleteCustomer(id) {
-  return fetch(`${API_BASE}/${id}`, { method: 'DELETE' }).then(handleResponse)
+  return fetch(`${API_BASE}/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  }).then(handleResponse)
 }
